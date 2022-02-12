@@ -20,7 +20,7 @@ runs:
       shell: bash
     - run:  ls ${{ github.action_path }}
       shell: bash
-    - run:  echo Using docker ${docker -v}
+    - run:  echo Using docker $(docker -v)
       shell: bash
     - run: echo Hello ${{ inputs.dinosaur-to-greet }}.
       shell: bash
