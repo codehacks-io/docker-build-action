@@ -8,8 +8,8 @@ This action publishes the docker image to 2 registries:
 - Google Artifact Registry.
 
 At build time, this action provides 2 arguments to the `docker build` command:
-- `VERSION`: See [version](###version).
-- `VERSION_SHA_BUILD`: See [version-sha-build](###version-sha-build).
+- `VERSION`: See [version](#version).
+- `VERSION_SHA_BUILD`: See [version-sha-build](#version-sha-build).
 
 -----
 
