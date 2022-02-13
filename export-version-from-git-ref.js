@@ -6,7 +6,7 @@ const getImageAndVersionRegex = /(?<=refs\/tags\/v)(?<version>.*)/;
  *
  * - VERSION: e.g. "0.0.1"
  * - VERSION_SHA: e.g. "0.0.1-534716e"
- * - VERSION_SHA_BUILD: VERSION + GITHUB_SHA + build system (GitHub actions "ga") + run id + run number e.g. "0.0.1-534716e-ga-953451460-1"
+ * - VERSION_SHA_BUILD: VERSION + GITHUB_SHA + build system (GitHub actions "ga") + run id + run number e.g. "0.0.1-534716e-ga-953451460"
  *
  * You must tag your GitHub release using the format "v<semver>" e.g. "v1", "v1.1", "v1.1.1" or "v0.0.1-rc.0" (always
  * with a lowercase "v").

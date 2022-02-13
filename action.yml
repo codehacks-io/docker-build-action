@@ -23,7 +23,7 @@ inputs:
     description: Token to authenticate to the Docker registry. If using GitHub registry, it can be generated at https://github.com/settings/tokens (it must have the write:packages scope). If deploying to Docker Hub, use an access token generated at https://hub.docker.com/settings/security.
     required: true
   google-registry-host:
-    description: Host of your Google Artifact Registry. Syntax `${LOCATION}-docker.pkg.dev`. LOCATION is the regional or multi-regional location of the repository where the image is stored, for example us-east1 or us.
+    description: Host of your Google Artifact Registry. Syntax `${LOCATION}-docker.pkg.dev`. `LOCATION` is the regional or multi-regional location of the repository where the image is stored, for example us-east1 or us.
     required: true
   google-registry-project-id:
     description: Your Google Cloud Console project ID. If your project ID contains a colon, because of how Docker treats colons, you must **replace** the `:` character with a `/`.
@@ -32,7 +32,7 @@ inputs:
     description: Name of the repository where the image is stored.
     required: true
   google-registry-image:
-    description: Image's name. I's the "test-image" part in "us-east1-docker.pkg.dev/my-project/my-repo/test-image".
+    description: Image name. I's the "test-image" part in "us-east1-docker.pkg.dev/my-project/my-repo/test-image".
     required: true
   google-registry-service-account-key-base64:
     description: Base64-encoded vserion of the service account key used to push the image to Google Artifact Registry.
