@@ -11,6 +11,7 @@ The docker image gets published to 2 registries:
 
 At build time, this action provides 2 arguments to the `docker build` command:
 - `VERSION`: See [version](#version).
+- `VERSION_SHA`: See [version-sha](#version-sha).
 - `VERSION_SHA_BUILD`: See [version-sha-build](#version-sha-build).
 
 -----
