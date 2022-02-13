@@ -9,11 +9,6 @@ The docker image gets published to 2 registries:
 - A docker registry like GitHub registry or Docker Hub.
 - Google Artifact Registry.
 
-At build time, this action provides 2 arguments to the `docker build` command:
-- `VERSION`: See [version](#version).
-- `VERSION_SHA`: See [version-sha](#version-sha).
-- `VERSION_SHA_BUILD`: See [version-sha-build](#version-sha-build).
-
 -----
 
 ## Input arguments
@@ -179,7 +174,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
       - id: the-build
-        uses: codehacks-io/docker-build-action@v0.0.0 # You can also use the main branch
+        uses: codehacks-io/docker-build-action@v0.0.1 # You can also use the main branch
         with:
           dockerfile: ${{ github.workspace }}/Dockerfile
           dockercontext: ${{ github.workspace }}
@@ -196,4 +191,23 @@ jobs:
       - run:
           echo Built with tags '${{ steps.the-build.outputs.version }}', '${{ steps.the-build.outputs.version-sha }}' and '${{ steps.the-build.outputs.version-sha-build }}'.
         shell: bash
+```
+
+## Consume build args in Dockerfile
+
+At build time, this action provides some arguments to the `docker build` command:
+- `VERSION`: See [version](#version).
+- `VERSION_SHA`: See [version-sha](#version-sha).
+- `VERSION_SHA_BUILD`: See [version-sha-build](#version-sha-build).
+
+If you want to consume such arguments in your `Dockerfile` you can do it loke so:
+
+```Dockerfile
+ARG VERSION=local
+ARG VERSION_SHA=local
+ARG VERSION_SHA_BUILD=local
+
+ENV VERSION=${VERSION}
+ENV VERSION_SHA=${VERSION_SHA}
+ENV VERSION_SHA_BUILD=${VERSION_SHA_BUILD}
 ```
