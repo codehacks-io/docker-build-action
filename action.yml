@@ -79,7 +79,7 @@ runs:
           -t "${GOOGLE_DOCKER_TAG_PREFIX}:${VERSION_SHA_BUILD}" \
           --build-arg VERSION="${VERSION}" \
           --build-arg VERSION_SHA_BUILD="${VERSION_SHA_BUILD}" \
-          -f ${{ github.workspace }}/Dockerfile ${{ github.workspace }}
+          -f ${{ inputs.dockerfile }} ${{ inputs.dockercontext }}
     # Docker Push
     - name: 🐳 Push ${{ steps.outs.outputs.DOCKER_TAG_PREFIX }}:${{ steps.outs.outputs.VERSION_SHA_BUILD }}
       shell: bash
