@@ -170,7 +170,7 @@ on:
     types: [ created ]
 jobs:
   build-and-push:
-    name: Builds and Pushes docker image
+    name: Build and push docker image
     runs-on: ubuntu-latest
     environment: production
     timeout-minutes: 15
@@ -178,7 +178,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
       - id: the-build
-        uses: codehacks-io/docker-build@v0 # Specify the version or a branch to use.
+        uses: codehacks-io/docker-build-action@v0.0.0 # You can also use the main branch
         with:
           dockerfile: ${{ github.workspace }}/Dockerfile
           dockercontext: ${{ github.workspace }}
@@ -195,5 +195,4 @@ jobs:
       - run:
           echo Built with tags '${{ steps.the-build.outputs.version }}', '${{ steps.the-build.outputs.version-sha }}' and '${{ steps.the-build.outputs.version-sha-build }}'.
         shell: bash
-
 ```
