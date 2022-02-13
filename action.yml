@@ -1,14 +1,53 @@
-name: "Hello Rex"
-description: "Greet a dinosaur"
+name: "Docker Build"
+description: "Builds a docker image publishes it to a docker registry and to Google Artifact Registry"
 inputs:
   dinosaur-to-greet: # id of input
     description: "Dinosaur to greet"
     required: true
     default: "Elephant"
+  docker-registry-host:
+    description: It's the "ghcr.io" part in "ghcr.io/codehacks-io/repo-name:latest". For pushing docker images to github, use "ghcr.io" (without double quotes).
+    required: true
+  docker-namespace:
+    description: It's the "codehacks-io" part in "ghcr.io/codehacks-io/repo-name:latest". It's usually your GitHub username (or your docker username if you are pushing to dockerhub).
+    required: true
+  docker-image:
+    description: It's the "repo-name" part in "ghcr.io/codehacks-io/repo-name:latest".
+    required: true
+  docker-user:
+    description: Your GitHub username or your Docker username.
+    required: true
+  docker-token:
+    description: Token to authenticate to the Docker registry. If using GitHub registry, it can be generated at https://github.com/settings/tokens (it must have the write:packages scope).
+    required: true
+  google-registry-host:
+    description: Host of your Google Artifact Registry. Syntax `${LOCATION}-docker.pkg.dev`. LOCATION is the regional or multi-regional location of the repository where the image is stored, for example us-east1 or us.
+    required: true
+  google-registry-project-id:
+    description: Your Google Cloud Console project ID. If your project ID contains a colon, because of how Docker treats colons, you must **replace** the `:` character with a `/`.
+    required: true
+  google-registry-repository:
+    description: Name of the repository where the image is stored.
+    required: true
+  google-registry-image:
+    description: Image's name. I's the "test-image" part in "us-east1-docker.pkg.dev/my-project/my-repo/test-image".
+    required: true
+  google-registry-service-account-key:
+    description: Service account key used to push the image to Google Artifact Registry.
+    required: true
 outputs:
   random-number:
     description: "Random number"
     value: ${{ steps.random-number-generator.outputs.random-id }}
+  version:
+    description: "Base tag (version) of the image. E.g. 0.0.0"
+    value: ${{ steps.outs.outputs.VERSION }}
+  version-sha:
+    description: "Tag (version+git sha) of the image. E.g. 0.0.0-667afef"
+    value: ${{ steps.outs.outputs.VERSION_SHA }}
+  version-sha-build:
+    description: "Tag (version+git sha+build sha) of the image. E.g. 0.0.0-667afef-ga-1833489878"
+    value: ${{ steps.outs.outputs.VERSION_SHA_BUILD }}
 runs:
   using: "composite"
   steps:
@@ -31,3 +70,61 @@ runs:
       shell: bash
     - run: goodbye.sh
       shell: bash
+    # Prepare tags
+    - name: 🏷️ Prepare tags
+      shell: bash
+      run: |
+        node ${{ github.action_path }}/export-version-from-git-ref.js
+    # Put tags in outputs
+    - name: 🏷️ Put tags in outputs
+      shell: bash
+      id: outs
+      run: |
+        echo "::set-output name=VERSION::${VERSION}"
+        echo "::set-output name=VERSION_SHA::${VERSION_SHA}"
+        echo "::set-output name=VERSION_SHA_BUILD::${VERSION_SHA_BUILD}"
+        echo DOCKER_TAG_PREFIX="${{ inputs.docker-registry-host }}/${{ inputs.docker-namespace }}/${{ inputs.docker-registry-image }}" >> $GITHUB_ENV
+        echo GOOGLE_DOCKER_TAG_PREFIX="${{ inputs.google-registry-host }}/${{ inputs.google-registry-project-id }}/${{ inputs.google-registry-repository }}/${{ inputs.google-registry-image }}" >> $GITHUB_ENV
+    # Registry login
+    - name: 🔑 Registry login
+      shell: bash
+      run: |
+        echo ${{ inputs.docker-token }} | docker login ${{ inputs.docker-registry-host }} -u ${{ inputs.docker-user }} --password-stdin
+    # Build
+    - name: 🔨 Build ${{ steps.outs.outputs.DOCKER_TAG_PREFIX }}:${{ steps.outs.outputs.VERSION_SHA_BUILD }}
+    # - name: 🔨 Build ${{ env.DOCKER_TAG_PREFIX }}:${{ env.VERSION_SHA_BUILD }}
+      shell: bash
+      run: |
+        docker build \
+          -t "${DOCKER_TAG_PREFIX}:latest" \
+          -t "${DOCKER_TAG_PREFIX}:${VERSION}" \
+          -t "${DOCKER_TAG_PREFIX}:${VERSION_SHA}" \
+          -t "${DOCKER_TAG_PREFIX}:${VERSION_SHA_BUILD}" \
+          -t "${GOOGLE_DOCKER_TAG_PREFIX}:latest" \
+          -t "${GOOGLE_DOCKER_TAG_PREFIX}:${VERSION}" \
+          -t "${GOOGLE_DOCKER_TAG_PREFIX}:${VERSION_SHA}" \
+          -t "${GOOGLE_DOCKER_TAG_PREFIX}:${VERSION_SHA_BUILD}" \
+          --build-arg VERSION="${VERSION}" \
+          --build-arg VERSION_SHA_BUILD="${VERSION_SHA_BUILD}" \
+          -f ${{ github.workspace }}/Dockerfile ${{ github.workspace }}
+    # Push
+    - name: 🐳 Push ${{ steps.outs.outputs.DOCKER_TAG_PREFIX }}:${{ steps.outs.outputs.VERSION_SHA_BUILD }}
+      shell: bash
+      run: |
+        docker push "${DOCKER_TAG_PREFIX}:latest"
+        docker push "${DOCKER_TAG_PREFIX}:${VERSION}"
+        docker push "${DOCKER_TAG_PREFIX}:${VERSION_SHA}"
+        docker push "${DOCKER_TAG_PREFIX}:${VERSION_SHA_BUILD}"
+    # Google Airtfact Registry login
+    - name: 🔑 Google Airtfact Registry login
+      shell: bash
+      run: |
+        echo ${{ inputs.google-registry-service-account-key }} | docker login -u _json_key_base64 --password-stdin https://${{ inputs.google-registry-host }}
+    # Google Airtfact Registry push
+    - name: 🐳 Push to Google Airtfact Registry ${{ steps.outs.outputs.DOCKER_TAG_PREFIX }}:${{ steps.outs.outputs.VERSION_SHA_BUILD }}
+      shell: bash
+      run: |
+        docker push "${GOOGLE_DOCKER_TAG_PREFIX}:latest"
+        docker push "${GOOGLE_DOCKER_TAG_PREFIX}:${VERSION}"
+        docker push "${GOOGLE_DOCKER_TAG_PREFIX}:${VERSION_SHA}"
+        docker push "${GOOGLE_DOCKER_TAG_PREFIX}:${VERSION_SHA_BUILD}"
