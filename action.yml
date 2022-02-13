@@ -69,7 +69,7 @@ runs:
         echo "::set-output name=VERSION::${VERSION}"
         echo "::set-output name=VERSION_SHA::${VERSION_SHA}"
         echo "::set-output name=VERSION_SHA_BUILD::${VERSION_SHA_BUILD}"
-        echo DOCKER_TAG_PREFIX="${{ inputs.docker-registry-host }}/${{ inputs.docker-namespace }}/${{ inputs.docker-registry-image }}" >> $GITHUB_ENV
+        echo DOCKER_TAG_PREFIX="${{ inputs.docker-registry-host }}/${{ inputs.docker-namespace }}/${{ inputs.docker-image }}" >> $GITHUB_ENV
         echo GOOGLE_DOCKER_TAG_PREFIX="${{ inputs.google-registry-host }}/${{ inputs.google-registry-project-id }}/${{ inputs.google-registry-repository }}/${{ inputs.google-registry-image }}" >> $GITHUB_ENV
     # Registry login
     - name: 🔑 Registry login
