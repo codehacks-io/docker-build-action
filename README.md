@@ -1,4 +1,4 @@
-# docker-build
+# docker-build-action
 
 Builds a docker image and publishes it.
 
