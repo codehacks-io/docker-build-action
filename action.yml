@@ -1,6 +1,12 @@
 name: "Docker Build"
 description: "Builds a docker image publishes it to a docker registry and to Google Artifact Registry"
 inputs:
+  dockerfile:
+    description: Path to your Dockerfile.
+    required: true
+  dockercontext:
+    description: Path to your Docker context used to build the image.
+    required: true
   docker-registry-host:
     description: Host of the docker registry where to publish the image. It's the "ghcr.io" part in "ghcr.io/codehacks-io/repo-name:latest".
     required: true
